@@ -6,6 +6,9 @@
   "author": "znfnfns0365 <znfnfns0365@naver.com>",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
   "dependencies": {
     "express": "^4.19.2",
     "socket.io": "^4.7.5"
