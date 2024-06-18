@@ -20,14 +20,16 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 10000; // 유저 골드
+let userGold = 100; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 
-let towerCost = 0; // 타워 구입 비용
+let towerCost = 20; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = stages.data[0].monsterLevel; // 몬스터 레벨
-let monsterSpawnInterval = stages.data[0].monsterSpawnInterval; // 몬스터 생성 주기
+// let monsterLevel = stages.data[0].monsterLevel; // 몬스터 레벨
+// let monsterSpawnInterval = stages.data[0].monsterSpawnInterval; // 몬스터 생성 주기
+let monsterLevel = 6; // 몬스터 레벨
+let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -150,25 +152,37 @@ function getRandomPositionNearPath(maxDistance) {
 function placeInitialTowers() {
   /* 
     타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
+    무언가 빠진 코드가 있는 것 같지 않나요? ->placenewtower로 로직 통합
   */
+
+  //스테이지별 초기 타워 개수 세팅으로 변경
   for (let i = 0; i < numOfInitialTowers; i++) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost);
-    towers.push(tower);
-    tower.draw(ctx, towerImage);
+    placeNewTower();
   }
 }
 
+//타워 생성시 위치 검증로직(겹치지않게)
+function isPositionValid(newX, newY) {
+  return !towers.some((tower) => {
+    const distance = Math.sqrt(Math.pow(tower.x - newX, 2) + Math.pow(tower.y - newY, 2));
+    return distance < tower.width; // 타워 크기만큼 거리가 가까우면 겹침
+  });
+}
+
+//타워 추가 생성시 유저 골드 확인 후 설치
 function placeNewTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
-  towers.push(tower);
-  tower.draw(ctx, towerImage);
+  if (userGold >= towerCost) {
+    let { x, y } = getRandomPositionNearPath(200);
+    while (!isPositionValid(x, y)) {
+      ({ x, y } = getRandomPositionNearPath(200));
+    }
+    const tower = new Tower(x, y);
+    towers.push(tower);
+    tower.draw(ctx, towerImage);
+    userGold -= towerCost; // 골드 차감
+  } else {
+    alert('골드가 부족합니다!');
+  }
 }
 
 function placeBase() {
@@ -206,6 +220,10 @@ function gameLoop() {
       );
       if (distance < tower.range) {
         tower.attack(monster);
+        if (monster.hp <= 0) {
+          userGold += monster.goldReward; // 몬스터 처치 시 골드 획득
+          // 몬스터 배열에서 제거
+        }
       }
     });
   });
@@ -238,7 +256,7 @@ function gameLoop() {
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
-      // sendEvent(68, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level });
+      sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level });
       monsters.splice(i, 1);
     }
   }
