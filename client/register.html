@@ -43,11 +43,13 @@
       <button id="register">회원가입</button>
       <button id="back">뒤로가기</button>
     </div>
-    <script>
+    <script type="module" src="./src/register.js">
+      import { sendEvent } from "./Socket.js";
+
       document.getElementById("register").addEventListener("click", () => {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
-
+        sendEvent(1, {username:username, password:password});
         /* 
           회원가입 API 호출 후 회원가입 성공 시 index.html로 이동시켜주세요!
         */

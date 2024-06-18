@@ -1,7 +1,8 @@
 import express from 'express';
 import { createServer } from 'http';
 import initSocket from './init/socket.js';
-import { loadGameAssets } from './init/assets.js';
+import registerHandler from './handlers/register.handler.js';
+// import { loadGameAssets } from './init/assets.js';
 
 const app = express();
 const server = createServer(app);
@@ -11,6 +12,10 @@ const PORT = 3306;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('client'));
+
+app.post('/register', (req, res) => {
+  registerHandler(req, res, io);
+});
 
 initSocket(server);
 
