@@ -2,7 +2,12 @@ import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
 
-/* 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}/* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
@@ -11,14 +16,14 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 0; // 유저 골드
+let userGold = 100; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
-let towerCost = 0; // 타워 구입 비용
+let towerCost = 20; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterLevel = 6; // 몬스터 레벨
+let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -141,26 +146,41 @@ function getRandomPositionNearPath(maxDistance) {
 function placeInitialTowers() {
   /* 
     타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
+    무언가 빠진 코드가 있는 것 같지 않나요? ->placenewtower로 로직 통합
   */
+
+  //스테이지별 초기 타워 개수 세팅으로 변경
   for (let i = 0; i < numOfInitialTowers; i++) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost);
+    placeNewTower();
+}
+}
+
+//타워 생성시 위치 검증로직(겹치지않게)
+function isPositionValid(newX, newY) {
+  return !towers.some(tower => {
+    const distance = Math.sqrt(
+      Math.pow(tower.x - newX, 2) + Math.pow(tower.y - newY, 2)
+    );
+    return distance < tower.width; // 타워 크기만큼 거리가 가까우면 겹침
+  });
+}
+
+//타워 추가 생성시 유저 골드 확인 후 설치
+function placeNewTower() {
+  if (userGold >= towerCost) {
+    let { x, y } = getRandomPositionNearPath(200);
+    while (!isPositionValid(x, y)) {
+      ({ x, y } = getRandomPositionNearPath(200));
+    }
+    const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImage);
+    userGold -= towerCost; // 골드 차감
+  } else {
+    alert("골드가 부족합니다!");
   }
 }
 
-function placeNewTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
-  towers.push(tower);
-  tower.draw(ctx, towerImage);
-}
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -197,6 +217,10 @@ function gameLoop() {
       );
       if (distance < tower.range) {
         tower.attack(monster);
+        if (monster.hp <= 0) {
+          userGold += monster.goldReward; // 몬스터 처치 시 골드 획득
+         // 몬스터 배열에서 제거
+        }
       }
     });
   });
@@ -249,13 +273,24 @@ Promise.all([
   ),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
-  serverSocket = io("서버주소", {
+  //let authCookie = getCookie("authorization");
+//author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
+  // if (!authCookie) {
+  //   // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
+  //   alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+  //   window.location.href = '/login.html'; // 로그인 페이지로 이동
+  //   return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
+  // }
+  
+  serverSocket = io("http://localhost:3306", {
     auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+      //token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
-
+  
+  console.log(serverSocket.auth.token);
+  initGame()
+  initMap()
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
