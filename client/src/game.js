@@ -2,7 +2,8 @@ import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import stages from '../assets/stage.json.js';
-import { sendEvent } from './Socket.js';
+import './Socket.js';
+import { CLIENT_VERSION } from './Constants.js';
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -13,12 +14,13 @@ function getCookie(name) {
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
+let userId = null;
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 0; // 유저 골드
+let userGold = 10000; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 
@@ -217,9 +219,20 @@ function gameLoop() {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
         /* 게임 오버 */
-        sendEvent(44, { score, highScore });
         if (highScore < score) highScore = score;
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        //게임 오버시 이벤트 발생
+        sendEvent(3, {
+          userGold,
+          baseHp,
+          numOfInitialTowers,
+          monsterLevel,
+          monsterSpawnInterval,
+          score,
+          highScore,
+          monsters,
+          towers,
+        });
         location.reload();
       }
       monster.draw(ctx);
@@ -233,7 +246,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame() {
+function initGame(token) {
   if (isInitGame) {
     return;
   }
@@ -245,6 +258,7 @@ function initGame() {
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
+  //게임 시작 이벤트 발생
   sendEvent(2, {
     userGold,
     baseHp,
@@ -255,7 +269,8 @@ function initGame() {
     highScore,
     monsters,
     towers,
-  }); //최초 게임 실행후 서버에 정보 전달
+    token,
+  });
   isInitGame = true;
 }
 
@@ -277,15 +292,25 @@ Promise.all([
     return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
   }
 
-  serverSocket = io('http://localhost:3306', {
+  serverSocket = io('http://localhost:3000', {
+    query: {
+      clientVersion: CLIENT_VERSION,
+    },
     auth: {
       token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
 
+  serverSocket.on('response', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('connection', (data) => {
+    console.log('connection: ', data);
+  });
+
   console.log(serverSocket.auth.token);
-  initGame();
-  initMap();
+  initGame(serverSocket.auth.token);
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
@@ -295,6 +320,15 @@ Promise.all([
     }
   */
 });
+
+const sendEvent = (handlerId, payload) => {
+  serverSocket.emit('event', {
+    userId,
+    clientVersion: CLIENT_VERSION,
+    handlerId,
+    payload,
+  });
+};
 
 const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';

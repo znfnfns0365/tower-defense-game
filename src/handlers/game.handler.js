@@ -1,6 +1,6 @@
 import { getGameAssets } from "../init/assets.js";
 import { clearStage, getStage, setStage } from "../models/stage.model.js";
-import { prisma } from '../../utils/prisma/index.js';
+// import { prisma } from '../../utils/prisma/index.js';
 
 
 export const gameStart = (uuid, payload) => { //uuid 받는다고 가정
@@ -37,12 +37,12 @@ export const gameEnd = (uuid, payload) => {
         const highScore = score
     }
 
-    const recordHighScore = prisma.user.update({
-        where: { accountId: uuid },
-        data: {
-            highScore: highScore
-        }
-    })
+    // const recordHighScore = prisma.user.update({
+    //     where: { accountId: uuid },
+    //     data: {
+    //         highScore: highScore
+    //     }
+    // })
 
     return { status: "sueccess", message: "게임 종료", score };
 }
