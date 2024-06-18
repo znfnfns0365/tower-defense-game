@@ -2,6 +2,8 @@ import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
 import stages from "../assets/stage.json.js";
+import "./Socket.js"
+import { sendEvent } from './Socket.js';
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -231,7 +233,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame() {
+function initGame(token) {
   if (isInitGame) {
     return;
   }
@@ -244,7 +246,7 @@ function initGame() {
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   //게임 시작 이벤트 발생
-  sendEvent(2, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers });
+  sendEvent(2, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers, token });
   isInitGame = true;
 
 }
@@ -260,33 +262,23 @@ Promise.all([
   ),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-<<<<<<< HEAD
-  let somewhere;
-  serverSocket = io({
-=======
   let authCookie = getCookie("authorization");
-//author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
+  //author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
   if (!authCookie) {
     // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
     alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
     window.location.href = '/login.html'; // 로그인 페이지로 이동
     return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
   }
-  
+
   serverSocket = io("http://localhost:3306", {
->>>>>>> 9ef090c804b8610aee0069847e6b58da8be7e1a9
     auth: {
       token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
-<<<<<<< HEAD
-  initGame();
-=======
-  
+
   console.log(serverSocket.auth.token);
-  initGame()
-  initMap()
->>>>>>> 9ef090c804b8610aee0069847e6b58da8be7e1a9
+  initGame(serverSocket.auth.token)
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});

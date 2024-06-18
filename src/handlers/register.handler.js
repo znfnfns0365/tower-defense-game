@@ -15,24 +15,23 @@ const registerHandler = async (req, res, io) => {
       where: { username },
     });
 
- if (existingUser) {
-            return res.status(400).json({ message: '이미 존재하는 사용자 이름입니다.' });
-        }
+    if (existingUser) {
+      return res.status(400).json({ message: '이미 존재하는 사용자 이름입니다.' });
+    }
 
-        const newUser = await addUser(username, password);
+    const newUser = await addUser(username, password);
 
-    alert('유저가 생성되었습니다');
     res.status(201).json({
       message: '유저가 생성되었습니다',
       user: {
-        uuid:newUser.uuid,
+        uuid: newUser.uuid,
         username: newUser.username,
       }
     });
     io.emit('user-registered', { username: newUser.username, uuid: newUser.uuid });
   } catch (error) {
     console.log('회원 가입중 에러 발생', error);
-    res.status(500).json({message:'서버 오류 발생'});
+    res.status(500).json({ message: '서버 오류 발생' });
   }
 };
 

@@ -1,17 +1,6 @@
-<<<<<<< HEAD
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-=======
 generator client {
   provider = "prisma-client-js"
   output = "./generated/userDataClient"
->>>>>>> 9ef090c804b8610aee0069847e6b58da8be7e1a9
 }
 
 datasource db {
@@ -20,15 +9,6 @@ datasource db {
 }
 
 model User {
-<<<<<<< HEAD
-  accountId String @id @map("account_id")
-  id String @unique @map("id")
-  password String @map("password")
-  highScore Int @map("high_score")
-
-  @@map("user")
-}
-=======
   uuid String @id @map("account_id")
   username        String @unique @map("username")
   password  String @map("password")
@@ -36,4 +16,3 @@ model User {
 
   @@map("user")
 }
->>>>>>> 9ef090c804b8610aee0069847e6b58da8be7e1a9

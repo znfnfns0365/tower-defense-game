@@ -13,7 +13,6 @@ socket.on('response', (data) => {
 
 socket.on('connection', (data) => {
   console.log('connection: ', data);
-  userId = data.uuid;
 });
 
 const sendEvent = (handlerId, payload) => {
