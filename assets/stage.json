@@ -1,0 +1,21 @@
+{
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 1000,
+      "monsterLevel": 1,
+      "creationCycle": 1000
+    },
+    {
+      "id": 1001,
+      "monsterLevel": 2,
+      "creationCycle": 1000
+    },
+    {
+      "id": 1002,
+      "monsterLevel": 3,
+      "creationCycle": 1000
+    }
+  ]
+}
