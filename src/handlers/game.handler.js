@@ -1,9 +1,18 @@
 import { getGameAssets } from "../init/assets.js";
 import { clearStage, getStage, setStage } from "../models/stage.model.js";
+import jwt from "jsonwebtoken";
 // import { prisma } from '../../utils/prisma/index.js';
 
+export const gameStart = (payload) => { //uuid 받는다고 가정
 
-export const gameStart = (uuid, payload) => { //uuid 받는다고 가정
+    //검증 미들웨어 하드코딩
+    const authorization = payload.token
+    if (!authorization) throw new Error("토큰이 존재하지 않습니다.");
+    const [tokenType, token] = authorization.split("%20");
+    if (tokenType !== "Bearer") throw new Error("토큰 타입이 일치하지 않습니다.");
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const uuid = decodedToken.user_id;
 
     const { stages } = getGameAssets();
 

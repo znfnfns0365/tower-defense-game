@@ -23,7 +23,7 @@ export const handlerEvent = (io, socket, data) => {
         socket.emit('response', { status: 'fail', message: "Handler not found" })
         return;
     }
-    const response = handler(data.userId, data.payload);
+    const response = handler(data.payload);
 
     if (response.broadcast) {
         io.emit('response', 'broadcast');

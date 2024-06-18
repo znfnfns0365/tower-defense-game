@@ -10,19 +10,19 @@ const loginHandler = async (req, res, io) => {
     try {
       // 해당 계정 id와 일치하는 계정 id가 있는지 DB에서 찾아봅니다.
       const account = await userDataClient.user.findFirst({
-        where: { username },
+        where: { username:username },
       });
       // 해당 계정id가 DB에 존재하지 않는 계정id라면, 해당 사실을 알립니다.
       if (!account) return res.status(401).json({ message: "존재하지 않는 계정입니다." });
       // 입력받은 사용자의 비밀번호와 데이터베이스에 저장된 비밀번호를 비교합니다.
       else if (!(await bcrypt.compare(password, account.password)))
         return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
-  
+      console.log(account);
       // jwt token 생성
       const token = jwt.sign(
         {
           type: "JWT",
-          user_id: account.account_id,
+          user_id: account.uuid,
         },
         process.env.JWT_SECRET_KEY,
         {
