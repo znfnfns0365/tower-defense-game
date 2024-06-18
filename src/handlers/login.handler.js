@@ -1,17 +1,15 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-// import { PrismaClient as prisma } from "";
-
-dotenv.config();
+import { userDataClient } from "../utils/prisma/index.js";
+import bcrypt from 'bcrypt';
 
 // / 로그인 API /
 const loginHandler = async (req, res, io) => {
-  
   // 요청받은 데이터 accountId, accountPassword를 저장합니다.
   const { username, password } = req.body;
+
     try {
       // 해당 계정 id와 일치하는 계정 id가 있는지 DB에서 찾아봅니다.
-      const account = await prisma.account.findFirst({
+      const account = await userDataClient.user.findFirst({
         where: { username },
       });
       // 해당 계정id가 DB에 존재하지 않는 계정id라면, 해당 사실을 알립니다.
@@ -32,13 +30,16 @@ const loginHandler = async (req, res, io) => {
         }
       );
   
-      return res.status(200).json({ 
-        message: "로그인", 
-        authorization: `Bearer ${token}`,
-        acocunt_id: account.account_id
-      });
+      res.cookie("authorization", `Bearer ${token}`);
+//쿠키나, 로컬 스토리지를 사용
+      return res.status(200).json({message:"로그인 성공",
+        account_id:account.account_id,
+      })
     } catch (error) {
       console.error("로그인에 오류 발생!", error);
       return res.status(500).json("Server Error: 500");
     }
   };
+
+  
+export default loginHandler;
