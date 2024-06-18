@@ -2,7 +2,12 @@ import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
 
-/* 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}/* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
@@ -249,12 +254,21 @@ Promise.all([
   ),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
-  serverSocket = io("서버주소", {
+  let authCookie = getCookie("authorization");
+//author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
+  if (!authCookie) {
+    // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
+    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/login.html'; // 로그인 페이지로 이동
+    return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
+  }
+  
+  serverSocket = io("http://localhost:3306", {
     auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+      token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
+  console.log(serverSocket.auth.token);
   initGame()
   initMap()
   /* 

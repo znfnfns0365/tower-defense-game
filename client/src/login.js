@@ -1,7 +1,8 @@
 document.getElementById("login").addEventListener("click",async () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
-    
+    console.log("hello world");
+    // sendEvent(1, authorizationrequest)=> 
 
     try {
         const response = await fetch('/login', {
