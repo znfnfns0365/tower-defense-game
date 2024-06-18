@@ -1,5 +1,3 @@
-import { sendEvent } from "./socket.js";
-
 document.getElementById("register").addEventListener("click", async () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
