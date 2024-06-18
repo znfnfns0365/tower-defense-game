@@ -1,6 +1,6 @@
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
-
+import jwt from 'jsonwebtoken';
 export const handleDisconnect = (socket) => {};
 
 export const handleConnection = (socket) => {
@@ -15,18 +15,34 @@ export const handlerEvent = (io, socket, data) => {
     return;
   }
 
-  console.log(data.payload.token);
+  console.log(data);
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
     socket.emit('response', { status: 'fail', message: 'Handler not found' });
     return;
   }
-  const response = handler(data.userId, data.payload);
+  //검증 미들웨어 하드코딩
+  try {
+    let uuid;
+    if (data.handlerId === 2) {
+      const authorization = data.payload.token;
+      if (!authorization) throw new Error('토큰이 존재하지 않습니다.');
+      const [tokenType, token] = authorization.split('%20');
+      if (tokenType !== 'Bearer') throw new Error('토큰 타입이 일치하지 않습니다.');
+      uuid = jwt.verify(token, process.env.JWT_SECRET_KEY).user_id;
+    } else {
+      uuid = data.userId;
+    }
+    console.log('uuid:', uuid);
+    const response = handler(uuid, data.payload);
 
-  if (response.broadcast) {
-    io.emit('response', 'broadcast');
-    return;
+    if (response.broadcast) {
+      io.emit('response', 'broadcast');
+      return;
+    }
+
+    socket.emit('response', response);
+  } catch (e) {
+    return e;
   }
-
-  socket.emit('response', response);
 };

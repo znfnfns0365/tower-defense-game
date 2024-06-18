@@ -321,6 +321,9 @@ Promise.all([
 
   serverSocket.on('response', (data) => {
     console.log(data);
+    if (data.uuid !== undefined) {
+      userId = data.uuid;
+    }
   });
 
   serverSocket.on('connection', (data) => {
