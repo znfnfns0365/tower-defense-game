@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+
+import { userDataClient } from "../utils/prisma/index.js";
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-
-const prisma = new PrismaClient();
 
 //db에서 user를 저장
 export const addUser = async (username, password) =>{
@@ -10,10 +9,10 @@ export const addUser = async (username, password) =>{
 
     const userUUID = uuidv4();
 
-    const newUser = await prisma.user.create({
+    const newUser = await userDataClient.user.create({
         data: {
-            accountId: userUUID,
-            id: username,
+            uuid: userUUID,
+            username: username,
             password: hashedPassword,
         }
     });

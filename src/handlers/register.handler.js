@@ -1,4 +1,5 @@
-import { addUser } from '../models/user.model';
+import { addUser } from '../models/user.model.js';
+import { userDataClient } from "../utils/prisma/index.js";
 
 
 const registerHandler = async (req, res, io) => {
@@ -9,7 +10,7 @@ const registerHandler = async (req, res, io) => {
       return res.status(400).json({ message: '유저 이름과 비밀번호를 입력해주세요.' });
     }
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await userDataClient.user.findUnique({
       //id? accountid?
       where: { username },
     });
@@ -24,7 +25,7 @@ const registerHandler = async (req, res, io) => {
     res.status(201).json({
       message: '유저가 생성되었습니다',
       user: {
-        id:newUser.uuid,
+        uuid:newUser.uuid,
         username: newUser.username,
       }
     });
