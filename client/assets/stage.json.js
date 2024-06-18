@@ -1,4 +1,4 @@
-{
+export default {
   "name": "stage",
   "version": "1.0.0",
   "data": [

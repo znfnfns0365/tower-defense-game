@@ -1,6 +1,7 @@
 import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
+import stages from "../assets/stage.json.js";
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -13,12 +14,12 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
+let baseHp = 1000; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterLevel = stages.data[0].monsterLevel; // 몬스터 레벨
+let monsterSpawnInterval = stages.data[0].monsterSpawnInterval; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -235,7 +236,9 @@ function initGame() {
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
+  sendEvent(2, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers }); //최초 게임 실행후 서버에 정보 전달
   isInitGame = true;
+
 }
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
@@ -255,7 +258,7 @@ Promise.all([
       token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
-
+  initGame();
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
     e.g. serverSocket.on("...", () => {...});
