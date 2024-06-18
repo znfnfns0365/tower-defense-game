@@ -12,7 +12,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 0; // 유저 골드
+let userGold = 10000; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 
@@ -212,6 +212,8 @@ function gameLoop() {
       if (isDestroyed) {
         /* 게임 오버 */
         alert("게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ");
+        //게임 오버시 이벤트 발생
+        sendEvent(3, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers });
         location.reload();
       }
       monster.draw(ctx);
@@ -236,7 +238,8 @@ function initGame() {
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
-  sendEvent(2, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers }); //최초 게임 실행후 서버에 정보 전달
+  //게임 시작 이벤트 발생
+  sendEvent(2, { userGold, baseHp, numOfInitialTowers, monsterLevel, monsterSpawnInterval, score, highScore, monsters, towers });
   isInitGame = true;
 
 }
@@ -253,7 +256,7 @@ Promise.all([
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let somewhere;
-  serverSocket = io("서버주소", {
+  serverSocket = io({
     auth: {
       token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
