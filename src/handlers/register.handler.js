@@ -21,7 +21,7 @@ const registerHandler = async (req, res, io) => {
 
         const newUser = await addUser(username, password);
 
-
+    alert('유저가 생성되었습니다');
     res.status(201).json({
       message: '유저가 생성되었습니다',
       user: {

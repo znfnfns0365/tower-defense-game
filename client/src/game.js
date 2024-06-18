@@ -268,6 +268,7 @@ Promise.all([
       token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
   });
+  
   console.log(serverSocket.auth.token);
   initGame()
   initMap()
