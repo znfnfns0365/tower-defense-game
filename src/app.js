@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
-const PORT = 3306;
+const PORT = 3000;
 
 
 const io = initSocket(server); // initSocket에서 반환된 io 객체를 받아옴
@@ -22,7 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('client'));
 
-initSocket(server);
 
 app.post('/register', (req, res) => {
   registerHandler(req, res, io);

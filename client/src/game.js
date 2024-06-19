@@ -271,7 +271,7 @@ Promise.all([
     return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
   }
 
-  serverSocket = io("http://localhost:3306", {
+  serverSocket = io("http://localhost:3000", {
     auth: {
       token: authCookie, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
