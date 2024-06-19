@@ -22,7 +22,8 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 100; // 유저 골드
 let base; // 기지 객체
-let baseHp = 1000; // 기지 체력
+// let baseHp = 1000; // 기지 체력
+let baseHp = 1; // 임시 기지 체력
 
 let towerCost = 20; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
@@ -222,6 +223,7 @@ function gameLoop() {
         tower.attack(monster);
         if (monster.hp <= 0) {
           userGold += monster.goldReward; // 몬스터 처치 시 골드 획득
+          score += 10;
           // 몬스터 배열에서 제거
         }
       }
@@ -241,6 +243,7 @@ function gameLoop() {
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         //게임 오버시 이벤트 발생
         sendEvent(3, {
+          userId,
           userGold,
           baseHp,
           numOfInitialTowers,
@@ -320,11 +323,20 @@ Promise.all([
   });
 
   serverSocket.on('response', (data) => {
-    console.log(data);
-    if (data.uuid !== undefined) {
-      userId = data.uuid;
+    console.log("넘겨받은 데이타", data);
+
+    if (data.userData !== undefined) {
+      highScore = data.userData.highScore;
+      console.log('최고 점수 설정 완료: ', highScore);
     }
+
   });
+  serverSocket.on('uuid', (data) => {
+    userId = data;
+    console.log('uuid 설정 완료: ', data);
+  });
+
+
 
   serverSocket.on('connection', (data) => {
     console.log('connection: ', data);
