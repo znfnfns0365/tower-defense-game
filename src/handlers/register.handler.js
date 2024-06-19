@@ -1,6 +1,5 @@
 import { addUser } from '../models/user.model.js';
-import { userDataClient } from "../utils/prisma/index.js";
-
+import { userDataClient } from '../utils/prisma/index.js';
 
 const registerHandler = async (req, res, io) => {
   const { username, password } = req.body;
@@ -26,7 +25,7 @@ const registerHandler = async (req, res, io) => {
       user: {
         uuid: newUser.uuid,
         username: newUser.username,
-      }
+      },
     });
     io.emit('user-registered', { username: newUser.username, uuid: newUser.uuid });
   } catch (error) {

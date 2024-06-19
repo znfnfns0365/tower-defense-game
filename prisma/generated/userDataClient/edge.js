@@ -114,7 +114,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\gwang\\Desktop\\spartan\\tower_defense\\prisma\\generated\\userDataClient",
+      "value": "C:\\Users\\STORY\\Desktop\\김동헌\\sparta\\tower-defense-game\\prisma\\generated\\userDataClient",
       "fromEnvVar": null
     },
     "config": {
@@ -131,7 +131,8 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null
+    "rootEnvPath": null,
+    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
   "clientVersion": "5.15.0",
@@ -140,7 +141,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": true,
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
