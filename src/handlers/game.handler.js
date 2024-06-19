@@ -1,25 +1,16 @@
 import { getGameAssets } from '../init/assets.js';
 import { clearStage, getStage, setStage } from '../models/stage.model.js';
 
-// import { prisma } from '../../utils/prisma/index.js';
+import { userDataClient } from "../utils/prisma/index.js";
 
-export const gameStart = (uuid, payload) => {
+export const gameStart = async (uuid, payload) => {
   //uuid 받는다고 가정
-  console.log('gamestaret');
+  console.log('gamestaret', uuid);
   const { stages } = getGameAssets();
 
-  //   if (stages.data[0].monsterLevel != payload.monsterLevel) {
-  //     return { status: 'fail', message: '몬스터 레벨이 일치하지 않습니다.' };
-  //   }
-
-  //   if (stages.data[0].monsterSpawnInterval != payload.monsterSpawnInterval) {
-  //     return { status: 'fail', message: '몬스터 생성주기가 일치하지 않습니다.' };
-  //   }
-
-  //   if (false) {
-  //     //추후 로그인후 찾은 정보 바탕으로 최고 점수 받고 검증로직 작성
-  //     return { status: 'fail', message: '해당 유저의 최고점수가 일치하지 않습니다.' };
-  //   }
+  const userData = await userDataClient.user.findFirst({
+    where: { uuid: uuid }
+  })
 
   clearStage(uuid);
 
@@ -27,23 +18,21 @@ export const gameStart = (uuid, payload) => {
 
   console.log('Stage: ', getStage(uuid));
 
-  return { status: 'success', uuid };
+  return { status: 'success', userData };
 };
 
-export const gameEnd = (uuid, payload) => {
-  const score = payload.score;
+export const gameEnd = async (uuid, payload) => {
 
-  if (false) {
-    //추후 로그인후 찾은 정보 바탕으로 최고 점수 받고 검증로직 작성
-    const highScore = score;
+  if (payload.score >= payload.highScore) {
+    const recordHighScore = await userDataClient.user.update({
+      where: { uuid: uuid },
+      data: {
+        highScore: payload.highScore
+      }
+    })
   }
 
-  // const recordHighScore = prisma.user.update({
-  //     where: { accountId: uuid },
-  //     data: {
-  //         highScore: highScore
-  //     }
-  // })
 
-  return { status: 'sueccess', message: '게임 종료', score };
+
+  return { status: 'sueccess', message: '게임 종료' };
 };
