@@ -1,7 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { clearStage, getStage, setStage } from '../models/stage.model.js';
 
-import { userDataClient } from "../utils/prisma/index.js";
+import { userDataClient } from '../utils/prisma/index.js';
 
 export const gameStart = async (uuid, payload) => {
   //uuid 받는다고 가정
@@ -9,8 +9,8 @@ export const gameStart = async (uuid, payload) => {
   const { stages } = getGameAssets();
 
   const userData = await userDataClient.user.findFirst({
-    where: { uuid: uuid }
-  })
+    where: { uuid: uuid },
+  });
 
   clearStage(uuid);
 
@@ -22,17 +22,14 @@ export const gameStart = async (uuid, payload) => {
 };
 
 export const gameEnd = async (uuid, payload) => {
-
   if (payload.score >= payload.highScore) {
     const recordHighScore = await userDataClient.user.update({
       where: { uuid: uuid },
       data: {
-        highScore: payload.highScore
-      }
-    })
+        highScore: payload.highScore,
+      },
+    });
   }
-
-
 
   return { status: 'sueccess', message: '게임 종료' };
 };

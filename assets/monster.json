@@ -1,0 +1,48 @@
+{
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    {
+      "monsterId": 1,
+      "attackPower": 10,
+      "hp": 100,
+      "speed": 2,
+      "goldReward": 5
+    },
+    {
+      "monsterId": 2,
+      "attackPower": 20,
+      "hp": 100,
+      "speed": 3,
+      "goldReward": 5
+    },
+    {
+      "monsterId": 3,
+      "attackPower": 30,
+      "hp": 200,
+      "speed": 2,
+      "goldReward": 5
+    },
+    {
+      "monsterId": 4,
+      "attackPower": 40,
+      "hp": 200,
+      "speed": 4,
+      "goldReward": 5
+    },
+    {
+      "monsterId": 5,
+      "attackPower": 50,
+      "hp": 500,
+      "speed": 6,
+      "goldReward": 5
+    },
+    {
+      "monsterId": 6,
+      "attackPower": 100,
+      "hp": 10000,
+      "speed": 1,
+      "goldReward": 5
+    }
+  ]
+}

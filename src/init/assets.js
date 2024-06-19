@@ -24,9 +24,12 @@ const readFileAsync = (filename) => {
 export const loadGameAssets = async () => {
   //gameAssets에 모든 에셋 정보 저장
   try {
-    const [stages, items, itemUnlocks] = await Promise.all([readFileAsync('stage.json')]);
+    const [stages, monsters] = await Promise.all([
+      readFileAsync('stage.json'),
+      readFileAsync('monster.json'),
+    ]);
 
-    gameAssets = { stages };
+    gameAssets = { stages, monsters };
     return gameAssets;
   } catch (e) {
     throw new Error('Failed to load : ' + e.message);

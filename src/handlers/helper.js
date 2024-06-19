@@ -1,7 +1,7 @@
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 import jwt from 'jsonwebtoken';
-export const handleDisconnect = (socket) => { };
+export const handleDisconnect = (socket) => {};
 
 export const handleConnection = (socket) => {
   console.log('서버 연결 완료');
@@ -43,6 +43,7 @@ export const handlerEvent = async (io, socket, data) => {
 
     socket.emit('response', response);
   } catch (e) {
+    console.log(e);
     return e;
   }
 };

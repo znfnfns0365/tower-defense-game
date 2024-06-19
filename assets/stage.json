@@ -3,19 +3,40 @@
   "version": "1.0.0",
   "data": [
     {
-      "id": 1000,
+      "id": 0,
+      "score": 0,
       "monsterLevel": 1,
-      "monsterSpawnInterval": 1000
+      "monsterType": [0, 1],
+      "monsterSpawnInterval": 2048
     },
     {
-      "id": 1001,
+      "id": 1,
+      "score": 1000,
       "monsterLevel": 2,
-      "monsterSpawnInterval": 1000
+      "monsterType": [1, 2],
+      "monsterSpawnInterval": 1024
     },
     {
-      "id": 1002,
+      "id": 2,
+      "score": 2000,
       "monsterLevel": 3,
-      "monsterSpawnInterval": 1000
+      "monsterType": [2, 3],
+      "monsterSpawnInterval": 512
+    },
+    {
+      "id": 3,
+      "score": 3000,
+      "monsterLevel": 4,
+      "monsterType": [3, 4],
+      "monsterSpawnInterval": 256
+    },
+    {
+      "id": 4,
+      "score": 4000,
+      "monsterLevel": 5,
+      "monsterType": [3, 4, 5],
+      "_comment": "Super monster? maybe",
+      "monsterSpawnInterval": 512
     }
   ]
 }
