@@ -67,7 +67,11 @@
 
 스테이지 데이터 테이블
 
+![alt text](./readmeAssets/stage.png)
+
 몬스터 데이터 테이블
+
+![alt text](./readmeAssets/monster.png)
 
 ### Skills
 
