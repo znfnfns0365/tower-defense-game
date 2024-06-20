@@ -114,7 +114,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\STORY\\Desktop\\김동헌\\sparta\\tower-defense-game\\prisma\\generated\\userDataClient",
+      "value": "C:\\Users\\Windows 10\\Desktop\\tower-defense-game\\prisma\\generated\\userDataClient",
       "fromEnvVar": null
     },
     "config": {
@@ -141,7 +141,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {

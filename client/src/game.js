@@ -20,15 +20,16 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 100; // 유저 골드
+let userGold = 200; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 
 let towerCost = 20; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
+
 // let monsterLevel = stages.data[0].monsterLevel; // 몬스터 레벨
 // let monsterSpawnInterval = stages.data[0].monsterSpawnInterval; // 몬스터 생성 주기
-let monsterLevel = 6; // 몬스터 레벨
+let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
@@ -180,8 +181,20 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
     userGold -= towerCost; // 골드 차감
+    towerCost += 5;
   } else {
     alert('골드가 부족합니다!');
+  }
+}
+
+// 마지막에 설치된 타워 삭제 후 골드 추가
+function removeTower() {
+  if (towers.length > 0) {
+    towerCost -=5;
+    userGold += towerCost;  // towerCost * 타워레벨? 또는 그냥 강화비용만큼 감소
+    towers.pop();
+  } else {
+    alert('남은 타워가 없습니다!')
   }
 }
 
@@ -200,15 +213,18 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
-  ctx.font = '25px Times New Roman';
+  ctx.font = 'bold 25px Times New Roman';
   ctx.fillStyle = 'skyblue';
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
   ctx.fillStyle = 'white';
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
   ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = 'magenta';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillStyle = 'lime';
+  ctx.fillText(`포탑 가격: ${towerCost}`, 100, 250); // 최고 기록 표시
+
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -361,5 +377,16 @@ buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', placeNewTower);
-
 document.body.appendChild(buyTowerButton);
+
+const sellTowerButton = document.createElement('button');
+sellTowerButton.textContent = '타워 판매';
+sellTowerButton.style.position = 'absolute';
+sellTowerButton.style.top = '60px';
+sellTowerButton.style.right = '10px';
+sellTowerButton.style.padding = '10px 20px';
+sellTowerButton.style.fontSize = '16px';
+sellTowerButton.style.cursor = 'pointer';
+
+sellTowerButton.addEventListener('click', removeTower);
+document.body.appendChild(sellTowerButton);
