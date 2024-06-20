@@ -11,10 +11,14 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    this.level = 1; //타워 초기 레벨
+    this.upgradeCost = 50; //타워 업그레이드 비용
+    this.isSelected = false;  // 타워 선택 
   }
 
-  draw(ctx, towerImage) {
-    ctx.drawImage(towerImage, this.x, this.y, this.width, this.height);
+  draw(ctx, towerImages) {
+    const image = towerImages[this.level - 1];
+    ctx.drawImage(image, this.x, this.y, this.width, this.height);
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
@@ -24,6 +28,12 @@ export class Tower {
       ctx.stroke();
       ctx.closePath();
       this.beamDuration--;
+    }
+    //타워 선택시 빨간색으로 표시
+    if (this.isSelected) {
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
   }
 
@@ -37,9 +47,17 @@ export class Tower {
     }
   }
 
+  //타워 업그레이드 로직 추가
   updateCooldown() {
     if (this.cooldown > 0) {
       this.cooldown--;
+    }
+  }
+  upgrade() {
+    if (this.level < 6) {
+      this.level += 1;
+      this.attackPower += 90;
+      this.range += 40;
     }
   }
 }
