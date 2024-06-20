@@ -389,12 +389,12 @@ Promise.all([
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let authCookie = getCookie('authorization');
   //author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
-  // if (!authCookie) {
-  //   // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
-  //   alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-  //   window.location.href = '/login.html'; // 로그인 페이지로 이동
-  //   return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
-  // }
+  if (!authCookie) {
+    // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
+    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/login.html'; // 로그인 페이지로 이동
+    return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
+  }
 
   serverSocket = io('http://localhost:3000', {
     query: {
