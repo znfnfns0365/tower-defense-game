@@ -32,7 +32,7 @@ let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
-let costincrease = 1;
+let costIncrease = 0; // 타워 구매시 가격 증가량
 let numOfInitialTowers = 3; // 초기 타워 개수
 let Maxtower = 20; // 최대 타워개수
 export let gameAssets = {};
@@ -197,7 +197,7 @@ function placeNewTower() {
     tower.draw(ctx, towerImages);
     userGold -= towerCost; // 골드 차감
     if (towers.length > 3) { 
-      towerCost += costincrease; // 구매비용 증가
+      towerCost += costIncrease; // 구매비용 증가
     }
   } else {
     alert('골드가 부족합니다!');
@@ -208,7 +208,7 @@ function placeNewTower() {
 function removeTower() {
   if (towers.length > 0) {
     if (towers.length > 3) {
-      towerCost -= costincrease; // 구매비용 감소
+      towerCost -= costIncrease; // 구매비용 감소
     }
     let removedElement = towers.pop();
     userGold += towerCost + 50 * (removedElement.level - 1);
