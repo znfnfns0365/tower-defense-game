@@ -30,7 +30,7 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 100; // 유저 골드
 let base; // 기지 객체
-let baseHp = 1000; // 기지 체력
+let baseHp = 1; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
