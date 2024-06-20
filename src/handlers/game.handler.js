@@ -31,6 +31,13 @@ export const gameEnd = async (uuid, payload) => {
     const userData = JSON.parse(await getUser(username));
     userData.highScore = payload.highScore;
     setUser(username, userData);
+    const broadcast = `Username: ${username} has renew his/her highest score${'\n'}Score: ${payload.score}`;
+    console.log(broadcast);
+    return {
+      status: 'sueccess',
+      message: '게임 종료',
+      broadcast,
+    };
   }
 
   return { status: 'sueccess', message: '게임 종료' };

@@ -22,7 +22,6 @@ export class Monster {
 
   init(level) {
     const { monsters: monsterAssets } = this.gameAssets;
-    console.log(monsterAssets.data[this.monsterNumber]);
     this.speed = monsterAssets.data[this.monsterNumber].speed;
     this.maxHp = monsterAssets.data[this.monsterNumber].hp + 10 * level; // 몬스터의 현재 HP
     this.hp = this.maxHp; // 몬스터의 현재 HP

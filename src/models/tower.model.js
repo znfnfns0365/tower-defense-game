@@ -3,7 +3,7 @@
 const towers = {};
 
 export const clearTower = (uuid) => {
-  towers[uuid] = [];
+  towers[uuid] = {};
 };
 
 export const getTower = (uuid) => {
@@ -11,9 +11,13 @@ export const getTower = (uuid) => {
 };
 
 export const addTower = (uuid, payload) => {
-  // towers[uuid].
+  towers[uuid][payload.towerNumber] = payload.level;
 };
 
-export const updateTower = (uuid, payload) => {};
+export const updateTower = (uuid, payload) => {
+  towers[uuid][payload.towerNumber]++;
+};
 
-export const deleteTower = (uuid, payload) => {};
+export const deleteTower = (uuid, payload) => {
+  delete towers[uuid][payload.towerNumber];
+};

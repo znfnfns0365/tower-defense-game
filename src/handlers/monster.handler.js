@@ -50,6 +50,5 @@ export const monsterDead = (uuid, payload) => {
   }
 
   const message = `You just got rid of a ${payload.monsterLvl}Lv ${monsterType}`;
-  console.log(message);
   return { status: 'success', message };
 };
