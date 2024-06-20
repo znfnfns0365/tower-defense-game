@@ -33,7 +33,7 @@ let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
-let costIncrease = 0; // 타워 구매시 가격 증가량
+let costIncrease = 5; // 타워 구매시 가격 증가량
 let numOfInitialTowers = 3; // 초기 타워 개수
 let Maxtower = 20; // 최대 타워개수
 export let gameAssets = {};
@@ -279,6 +279,8 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
+  if (highScore < score) highScore = score;
+
   ctx.font = 'bold 25px Times New Roman';
   ctx.fillStyle = 'skyblue';
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
@@ -305,7 +307,6 @@ function gameLoop() {
         tower.attack(monster);
         if (monster.hp <= 0) {
           userGold += monster.goldReward; // 몬스터 처치 시 골드 획득
-          score += 10;
           // 몬스터 배열에서 제거
         }
       }
@@ -341,7 +342,7 @@ function gameLoop() {
       sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level, stage });
       score += 100;
       const { stages } = gameAssets;
-      if (stage !== 4 && score >= stages.data[stage + 1].score) {
+      if (stage !== 6 && score >= stages.data[stage + 1].score) {
         stage++;
         sendEvent(33, { stage, score });
         const monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기
@@ -498,13 +499,19 @@ shortcutInfo.style.left = '350px';
 shortcutInfo.style.padding = '10px 20px';
 shortcutInfo.style.fontSize = '16px';
 shortcutInfo.style.color = 'white';
-shortcutInfo.textContent = '키보드 입력도 지원합니다! 타워 구매 q키 /타워 환불: w키 / 타워 업그레이드: e키';
+shortcutInfo.textContent =
+  '키보드 입력도 지원합니다! 타워 구매 q키 /타워 환불: w키 / 타워 업그레이드: e키';
 document.body.appendChild(shortcutInfo);
 
 //u키로 업그레이드 진행 가능하도록 로직 추가
-//s키로 타워 환불 가능하도록 로직 추가  
+//s키로 타워 환불 가능하도록 로직 추가
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'e' && selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6) {
+  if (
+    event.key === 'e' &&
+    selectedTower &&
+    userGold >= selectedTower.upgradeCost &&
+    selectedTower.level < 6
+  ) {
     userGold -= selectedTower.upgradeCost;
     sendEvent(66, { towerNumber: selectedTower.number });
     selectedTower.upgrade();

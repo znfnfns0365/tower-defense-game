@@ -36,6 +36,20 @@
       "monsterLevel": 5,
       "monsterType": [2, 3, 4, 5],
       "monsterSpawnInterval": 1024
+    },
+    {
+      "id": 5,
+      "score": 32000,
+      "monsterLevel": 5,
+      "monsterType": [3, 4, 5],
+      "monsterSpawnInterval": 512
+    },
+    {
+      "id": 6,
+      "score": 64000,
+      "monsterLevel": 5,
+      "monsterType": [3, 4, 5],
+      "monsterSpawnInterval": 256
     }
   ]
 }
