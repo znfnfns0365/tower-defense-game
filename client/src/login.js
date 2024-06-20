@@ -29,6 +29,12 @@ document.getElementById("login").addEventListener("click",async () => {
     }
 });
 
-  document.getElementById("back").addEventListener("click", () => {
-    window.location.href = "index.html";
-  });
+//   document.getElementById("back").addEventListener("click", () => {
+//     window.location.href = "index.html";
+//   });
+
+// client/src/login.js
+// 로그인 버튼 클릭 시 게임 화면으로 바로 이동
+document.getElementById('loginButton').addEventListener('click', function () {
+    window.location.href = '/game';
+});
