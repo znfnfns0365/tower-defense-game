@@ -6,6 +6,7 @@ import loginHandler from './handlers/login.handler.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { getGameAssets, loadGameAssets } from './init/assets.js';
+import client from './utils/redis/redisClient.js';
 
 dotenv.config();
 
@@ -39,7 +40,11 @@ app.get('/api/assets', (req, res) => {
 
 server.listen(PORT, async () => {
   console.log(`포트 ${PORT} 서버가 실행되었습니다`);
-
+  try {
+    client.connect();
+  } catch (e) {
+    console.error('Failed to connect Redis', e);
+  }
   try {
     //이 곳에서 파일 읽음
     const assets = await loadGameAssets();
