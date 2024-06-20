@@ -11,11 +11,12 @@ export const getTower = (uuid) => {
 };
 
 export const addTower = (uuid, payload) => {
-  console.log(payload);
+  if (!towers[uuid]) towers[uuid] = {};
   towers[uuid][payload.towerNumber] = payload.level;
 };
 
 export const updateTower = (uuid, payload) => {
+  if (!towers[uuid]) towers[uuid] = {};
   towers[uuid][payload.towerNumber]++;
 };
 

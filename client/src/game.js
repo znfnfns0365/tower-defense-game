@@ -25,8 +25,9 @@ let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 6; // 몬스터 개수
+let intervalId = null;
 
-let userGold = 75; // 유저 골드
+let userGold = 100; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
@@ -193,7 +194,6 @@ function placeNewTower() {
     while (!isPositionValid(x, y)) {
       ({ x, y } = getRandomPositionNearPath(200));
     }
-    console.log(towerCount, 'sfsfdfsfds');
     sendEvent(55, { towerNumber: towerCount + 1, level: 1 });
     towerCount++;
     const tower = new Tower(x, y, towerCount);
@@ -340,7 +340,11 @@ function gameLoop() {
         stage++;
         sendEvent(33, { stage, score });
         const monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기
-        setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+        console.log(monsterSpawnInterval);
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+        intervalId = setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
       }
       monsters.splice(i, 1);
     } else {
@@ -395,6 +399,7 @@ Promise.all([
     return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
   }
 
+  // serverSocket = io('http://13.209.10.190:3000/', { 배포 전에 변경
   serverSocket = io('http://localhost:3000', {
     query: {
       clientVersion: CLIENT_VERSION,
