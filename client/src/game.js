@@ -248,8 +248,9 @@ function spawnMonster() {
   let monsterNumber;
   let goblinChance = Math.floor(Math.random() * 10);
   console.log(goblinChance);
-  if(goblinChance > 2) {goblinChance = true};
-  goblinChance === true ?monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
+  if(goblinChance > 8) {goblinChance = true}else{goblinChance = false};
+  console.log("golden goblin chance:", goblinChance);
+  goblinChance === true ? monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
   
   monsters.push(
     new Monster(
