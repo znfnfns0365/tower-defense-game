@@ -13,30 +13,29 @@
       "id": 1,
       "score": 1000,
       "monsterLevel": 2,
-      "monsterType": [1, 2],
-      "monsterSpawnInterval": 1024
+      "monsterType": [0, 1, 2],
+      "monsterSpawnInterval": 2048
     },
     {
       "id": 2,
       "score": 2000,
       "monsterLevel": 3,
-      "monsterType": [2, 3],
-      "monsterSpawnInterval": 512
+      "monsterType": [0, 1, 2, 3],
+      "monsterSpawnInterval": 1024
     },
     {
       "id": 3,
       "score": 3000,
       "monsterLevel": 4,
-      "monsterType": [3, 4],
-      "monsterSpawnInterval": 256
+      "monsterType": [0, 1, 2, 3, 4],
+      "monsterSpawnInterval": 1024
     },
     {
       "id": 4,
       "score": 4000,
       "monsterLevel": 5,
-      "monsterType": [3, 4],
-      "_comment": "Super monster? maybe",
-      "monsterSpawnInterval": 512
+      "monsterType": [1, 2, 3, 4],
+      "monsterSpawnInterval": 1024
     }
   ]
 }

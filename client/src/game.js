@@ -40,6 +40,7 @@ let monsterLevel; // 몬스터 레벨
 let monsterSpawnInterval; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
+let towerCount = 0;
 
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
@@ -192,11 +193,14 @@ function placeNewTower() {
     while (!isPositionValid(x, y)) {
       ({ x, y } = getRandomPositionNearPath(200));
     }
-    const tower = new Tower(x, y);
+    console.log(towerCount, 'sfsfdfsfds');
+    sendEvent(55, { towerNumber: towerCount + 1, level: 1 });
+    towerCount++;
+    const tower = new Tower(x, y, towerCount);
     towers.push(tower);
     tower.draw(ctx, towerImages);
     userGold -= towerCost; // 골드 차감
-    if (towers.length > 3) { 
+    if (towers.length > 3) {
       towerCost += costIncrease; // 구매비용 증가
     }
   } else {
@@ -210,31 +214,35 @@ function removeTower() {
     if (towers.length > 3) {
       towerCost -= costIncrease; // 구매비용 감소
     }
+    const selectedTower = towers[towers.length - 1];
+    sendEvent(77, { towerNumber: selectedTower.number }); // 타워 팔 때
     let removedElement = towers.pop();
     userGold += towerCost + 50 * (removedElement.level - 1);
-    
   } else {
-    alert('남은 타워가 없습니다!')
+    alert('남은 타워가 없습니다!');
   }
 }
-let selectedTower = null;  // 선택된 타워 저장
+let selectedTower = null; // 선택된 타워 저장
 
 canvas.addEventListener('click', (event) => {
   const { clientX, clientY } = event;
   selectedTower = null;
-  towers.forEach(tower => {
-    if (clientX >= tower.x && clientX <= tower.x + tower.width &&
-        clientY >= tower.y && clientY <= tower.y + tower.height) {
+  towers.forEach((tower) => {
+    if (
+      clientX >= tower.x &&
+      clientX <= tower.x + tower.width &&
+      clientY >= tower.y &&
+      clientY <= tower.y + tower.height
+    ) {
       tower.isSelected = true;
       selectedTower = tower;
     } else {
       tower.isSelected = false;
     }
   });
-  // 업그레이드 버튼 활성화 
+  // 업그레이드 버튼 활성화
   upgradeTowerButton.disabled = !selectedTower;
 });
-
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -247,18 +255,17 @@ function spawnMonster() {
   const monsterType = stages.data[stage].monsterType;
   let monsterNumber;
   let goblinChance = Math.floor(Math.random() * 10);
-  console.log(goblinChance);
-  if(goblinChance > 8) {goblinChance = true}else{goblinChance = false};
-  console.log("golden goblin chance:", goblinChance);
-  goblinChance === true ? monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
-  
+  if (goblinChance > 8) {
+    goblinChance = true;
+  } else {
+    goblinChance = false;
+  }
+  goblinChance === true
+    ? (monsterNumber = 5)
+    : (monsterNumber = Math.floor(Math.random() * monsterType.length));
+
   monsters.push(
-    new Monster(
-      monsterPath,
-      monsterImages,
-      stages.data[stage].monsterLevel,
-      monsterNumber,
-    ),
+    new Monster(monsterPath, monsterImages, stages.data[stage].monsterLevel, monsterNumber),
   );
 }
 
@@ -313,16 +320,8 @@ function gameLoop() {
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         //게임 오버시 이벤트 발생
         sendEvent(3, {
-          userId,
-          userGold,
-          baseHp,
-          numOfInitialTowers,
-          monsterLevel,
-          monsterSpawnInterval,
           score,
           highScore,
-          monsters,
-          towers,
         });
         location.reload();
       } else if (isDestroyed === 'monster') {
@@ -370,16 +369,8 @@ async function initGame(token) {
   gameLoop(); // 게임 루프 최초 실행
   //게임 시작 이벤트 발생
   sendEvent(2, {
-    userGold,
-    baseHp,
-    numOfInitialTowers,
-    monsterLevel,
-    monsterSpawnInterval,
-    score,
-    highScore,
-    monsters,
-    towers,
     token,
+    stage,
   });
   isInitGame = true;
 }
@@ -393,7 +384,7 @@ Promise.all([
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  console.log("All images loaded successfully");
+  console.log('All images loaded successfully');
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let authCookie = getCookie('authorization');
   //author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
@@ -414,12 +405,13 @@ Promise.all([
   });
 
   serverSocket.on('response', (data) => {
-    console.log(data);
-
     if (data.userData !== undefined) {
       highScore = data.userData.highScore;
       console.log('최고 점수 설정 완료: ', highScore);
     }
+
+    if (data.broadcast) console.log(data.broadcast);
+    else console.log(data);
   });
   serverSocket.on('uuid', (data) => {
     userId = data;
@@ -486,18 +478,19 @@ upgradeTowerButton.style.right = '10px';
 upgradeTowerButton.style.padding = '10px 20px';
 upgradeTowerButton.style.fontSize = '16px';
 upgradeTowerButton.style.cursor = 'pointer';
-upgradeTowerButton.disabled = true;  // 초기에는 비활성화
+upgradeTowerButton.disabled = true; // 초기에는 비활성화
 
 upgradeTowerButton.addEventListener('click', () => {
-  if (selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6 ) {
+  if (selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6) {
     userGold -= selectedTower.upgradeCost;
+    sendEvent(66, { towerNumber: selectedTower.number });
     selectedTower.upgrade();
     selectedTower.isSelected = false;
     selectedTower = null;
     upgradeTowerButton.disabled = true;
   } else if (userGold <= selectedTower.upgradeCost) {
     alert('골드가 부족합니다!');
-  } else if (selectedTower.level = 6 ) {
+  } else if ((selectedTower.level = 6)) {
     alert('이미 최대로 강화된 타워입니다!');
   }
 });
