@@ -26,7 +26,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 6; // 몬스터 개수
 
-let userGold = 7500; // 유저 골드
+let userGold = 75; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
