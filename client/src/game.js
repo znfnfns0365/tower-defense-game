@@ -26,12 +26,13 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 75; // 유저 골드
+let userGold = 7500; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
+let costincrease = 1;
 let numOfInitialTowers = 3; // 초기 타워 개수
 let Maxtower = 20; // 최대 타워개수
 export let gameAssets = {};
@@ -195,9 +196,9 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImages);
     userGold -= towerCost; // 골드 차감
-    // if (towers.length > 3) { 
-    //   towerCost += 1; // 구매비용 증가
-    // }
+    if (towers.length > 3) { 
+      towerCost += costincrease; // 구매비용 증가
+    }
   } else {
     alert('골드가 부족합니다!');
   }
@@ -206,11 +207,12 @@ function placeNewTower() {
 // 마지막에 설치된 타워 삭제 후 골드 추가
 function removeTower() {
   if (towers.length > 0) {
-    // if (towers.length > 3) {
-    //   towerCost -=1; // 구매비용 감소
-    // }
-    userGold += towerCost;  // towerCost * 타워레벨? 또는 그냥 강화비용 만큼
-    towers.pop();
+    if (towers.length > 3) {
+      towerCost -= costincrease; // 구매비용 감소
+    }
+    let removedElement = towers.pop();
+    userGold += towerCost + 50 * (removedElement.level - 1);
+    
   } else {
     alert('남은 타워가 없습니다!')
   }
@@ -481,12 +483,16 @@ upgradeTowerButton.style.cursor = 'pointer';
 upgradeTowerButton.disabled = true;  // 초기에는 비활성화
 
 upgradeTowerButton.addEventListener('click', () => {
-  if (selectedTower && userGold >= selectedTower.upgradeCost) {
+  if (selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6 ) {
     userGold -= selectedTower.upgradeCost;
     selectedTower.upgrade();
     selectedTower.isSelected = false;
     selectedTower = null;
     upgradeTowerButton.disabled = true;
+  } else if (userGold <= selectedTower.upgradeCost) {
+    alert('골드가 부족합니다!');
+  } else if (selectedTower.level = 6 ) {
+    alert('이미 최대로 강화된 타워입니다!');
   }
 });
 
