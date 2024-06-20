@@ -28,13 +28,14 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 100; // 유저 골드
+let userGold = 200; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
 let numOfInitialTowers = 3; // 초기 타워 개수
+let Maxtower = 20; // 최대 타워개수
 export let gameAssets = {};
 let monsterLevel; // 몬스터 레벨
 let monsterSpawnInterval; // 몬스터 생성 주기
@@ -49,8 +50,13 @@ let isInitGame = false;
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
 
-const towerImage = new Image();
-towerImage.src = 'images/tower.png';
+//타워 업그레이드시 이미지 변경
+const towerImages = [];
+for (let i = 1; i <= 6; i++) {
+  const img = new Image();
+  img.src = `images/tower${i}.png`;
+  towerImages.push(img);
+}
 
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
@@ -159,8 +165,7 @@ function getRandomPositionNearPath(maxDistance) {
 
 function placeInitialTowers() {
   /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? ->placenewtower로 로직 통합
+   ->placenewtower로 로직 통합
   */
 
   //스테이지별 초기 타워 개수 세팅으로 변경
@@ -177,8 +182,26 @@ function isPositionValid(newX, newY) {
   });
 }
 
+//최대 타워 갯수 제한
+function updateTowerCountDisplay() {
+  towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
+}
+
+const towerCountDisplay = document.createElement('div');
+towerCountDisplay.style.position = 'absolute';
+towerCountDisplay.style.top = '100px';
+towerCountDisplay.style.right = '10px';
+towerCountDisplay.style.padding = '10px 20px';
+towerCountDisplay.style.fontSize = '16px';
+towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
+document.body.appendChild(towerCountDisplay);
+
 //타워 추가 생성시 유저 골드 확인 후 설치
 function placeNewTower() {
+  if (towers.length >= Maxtower) {
+    alert('타워의 최대 개수에 도달했습니다!');
+    return;
+  }
   if (userGold >= towerCost) {
     let { x, y } = getRandomPositionNearPath(200);
     while (!isPositionValid(x, y)) {
@@ -186,12 +209,32 @@ function placeNewTower() {
     }
     const tower = new Tower(x, y);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
-    userGold -= towerCost; // 골드 차감
+    tower.draw(ctx, towerImages);
+    userGold -= towerCost;
+    updateTowerCountDisplay();
   } else {
     alert('골드가 부족합니다!');
   }
 }
+
+let selectedTower = null;  // 선택된 타워 저장
+
+canvas.addEventListener('click', (event) => {
+  const { clientX, clientY } = event;
+  selectedTower = null;
+  towers.forEach(tower => {
+    if (clientX >= tower.x && clientX <= tower.x + tower.width &&
+        clientY >= tower.y && clientY <= tower.y + tower.height) {
+      tower.isSelected = true;
+      selectedTower = tower;
+    } else {
+      tower.isSelected = false;
+    }
+  });
+  // 업그레이드 버튼 활성화 
+  upgradeTowerButton.disabled = !selectedTower;
+});
+
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -230,7 +273,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages);
     tower.updateCooldown();
     monsters.forEach((monster) => {
       const distance = Math.sqrt(
@@ -334,20 +377,22 @@ async function initGame(token) {
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  new Promise((resolve) => (towerImage.onload = resolve)),
+  ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  // new Promise((resolve) => (towerImages.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
+  console.log("All images loaded successfully");
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let authCookie = getCookie('authorization');
   //author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
-  if (!authCookie) {
-    // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
-    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/login.html'; // 로그인 페이지로 이동
-    return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
-  }
+  // if (!authCookie) {
+  //   // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
+  //   alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+  //   window.location.href = '/login.html'; // 로그인 페이지로 이동
+  //   return; // 로그인 페이지로 이동 후 아래 코드 실행되지 않도록 함
+  // }
 
   serverSocket = io('http://localhost:3000', {
     query: {
@@ -408,3 +453,27 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+//타워 업그레이드 버튼 추가
+const upgradeTowerButton = document.createElement('button');
+upgradeTowerButton.textContent = '타워 업그레이드';
+upgradeTowerButton.style.position = 'absolute';
+upgradeTowerButton.style.top = '50px';
+upgradeTowerButton.style.right = '10px';
+upgradeTowerButton.style.padding = '10px 20px';
+upgradeTowerButton.style.fontSize = '16px';
+upgradeTowerButton.style.cursor = 'pointer';
+upgradeTowerButton.disabled = true;  // 초기에는 비활성화
+
+upgradeTowerButton.addEventListener('click', () => {
+  if (selectedTower && userGold >= selectedTower.upgradeCost) {
+    userGold -= selectedTower.upgradeCost;
+    selectedTower.upgrade();
+    selectedTower.isSelected = false;
+    selectedTower = null;
+    upgradeTowerButton.disabled = true;
+    updateTowerCountDisplay();
+  }
+});
+
+document.body.appendChild(upgradeTowerButton);

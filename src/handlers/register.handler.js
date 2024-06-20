@@ -35,3 +35,4 @@ const registerHandler = async (req, res, io) => {
 };
 
 export default registerHandler;
+
