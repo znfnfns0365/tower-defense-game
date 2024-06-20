@@ -255,9 +255,10 @@ function spawnMonster() {
   const monsterType = stages.data[stage].monsterType;
   let monsterNumber;
   let goblinChance = Math.floor(Math.random() * 10);
-  console.log(goblinChance);
-  if (goblinChance > 2) {
+  if (goblinChance > 8) {
     goblinChance = true;
+  } else {
+    goblinChance = false;
   }
   goblinChance === true
     ? (monsterNumber = 5)

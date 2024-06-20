@@ -11,6 +11,7 @@ export const getTower = (uuid) => {
 };
 
 export const addTower = (uuid, payload) => {
+  console.log(payload);
   towers[uuid][payload.towerNumber] = payload.level;
 };
 
