@@ -210,18 +210,23 @@ function placeNewTower() {
 
 // 마지막에 설치된 타워 삭제 후 골드 추가
 function removeTower() {
-  if (towers.length > 0) {
-    if (towers.length > 3) {
-      towerCost -= costIncrease; // 구매비용 감소
+  if (selectedTower) {
+    const index = towers.indexOf(selectedTower);
+    if (index > -1) {
+      towers.splice(index, 1);
+      if (towers.length > 3) {
+        towerCost -= costIncrease; // 구매비용 감소
+      }
+      userGold += towerCost + 50 * (selectedTower.level - 1);
+      sendEvent(77, { towerNumber: selectedTower.number }); // 타워 팔 때
+      selectedTower = null;
+      updateTowerCountDisplay(); // 타워 개수 업데이트
     }
-    const selectedTower = towers[towers.length - 1];
-    sendEvent(77, { towerNumber: selectedTower.number }); // 타워 팔 때
-    let removedElement = towers.pop();
-    userGold += towerCost + 50 * (removedElement.level - 1);
   } else {
-    alert('남은 타워가 없습니다!');
+    alert('타워를 선택하세요!');
   }
 }
+
 let selectedTower = null; // 선택된 타워 저장
 
 canvas.addEventListener('click', (event) => {
@@ -479,6 +484,40 @@ upgradeTowerButton.style.padding = '10px 20px';
 upgradeTowerButton.style.fontSize = '16px';
 upgradeTowerButton.style.cursor = 'pointer';
 upgradeTowerButton.disabled = true; // 초기에는 비활성화
+
+//키보드로 타워 업그레이드 및 환불 안내 문구 추가
+const shortcutInfo = document.createElement('div');
+shortcutInfo.style.position = 'absolute';
+shortcutInfo.style.top = '10px';
+shortcutInfo.style.left = '350px';
+shortcutInfo.style.padding = '10px 20px';
+shortcutInfo.style.fontSize = '16px';
+shortcutInfo.style.color = 'white';
+shortcutInfo.textContent = '키보드 입력도 지원합니다! 타워 구매 q키 /타워 환불: w키 / 타워 업그레이드: e키';
+document.body.appendChild(shortcutInfo);
+
+//u키로 업그레이드 진행 가능하도록 로직 추가
+//s키로 타워 환불 가능하도록 로직 추가  
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'e' && selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6) {
+    userGold -= selectedTower.upgradeCost;
+    sendEvent(66, { towerNumber: selectedTower.number });
+    selectedTower.upgrade();
+    selectedTower.isSelected = false;
+    selectedTower = null;
+    upgradeTowerButton.disabled = true;
+  } else if (event.key === 'e' && selectedTower && userGold < selectedTower.upgradeCost) {
+    alert('골드가 부족합니다!');
+  } else if (event.key === 'e' && selectedTower && selectedTower.level === 6) {
+    alert('이미 최대로 강화된 타워입니다!');
+  } else if (event.key === 'w' && selectedTower) {
+    removeTower();
+    selectedTower = null;
+    upgradeTowerButton.disabled = true;
+  } else if (event.key === 'q') {
+    placeNewTower();
+  }
+});
 
 upgradeTowerButton.addEventListener('click', () => {
   if (selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6) {
