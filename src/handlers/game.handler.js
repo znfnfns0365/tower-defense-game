@@ -1,5 +1,6 @@
 import { getGameAssets } from '../init/assets.js';
 import { clearStage, getStage, setStage } from '../models/stage.model.js';
+import { clearTower } from '../models/tower.model.js';
 import { getUser, getUsername, setUser } from './userData.handler.js';
 
 export const gameStart = async (uuid, payload) => {
@@ -15,8 +16,9 @@ export const gameStart = async (uuid, payload) => {
   const userData = JSON.parse(await getUser(username));
 
   clearStage(uuid);
+  clearTower(uuid);
 
-  setStage(uuid, stages.data[0].id, payload);
+  setStage(uuid, payload);
 
   console.log('Stage: ', getStage(uuid));
 
@@ -29,6 +31,13 @@ export const gameEnd = async (uuid, payload) => {
     const userData = JSON.parse(await getUser(username));
     userData.highScore = payload.highScore;
     setUser(username, userData);
+    const broadcast = `Username: ${username} has renew his/her highest score${'\n'}Score: ${payload.score}`;
+    console.log(broadcast);
+    return {
+      status: 'sueccess',
+      message: '게임 종료',
+      broadcast,
+    };
   }
 
   return { status: 'sueccess', message: '게임 종료' };

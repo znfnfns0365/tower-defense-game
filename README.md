@@ -63,6 +63,8 @@
 
 ### 패킷 구조
 
+![alt text](./readmeAssets/packet.png)
+
 ### 데이터 테이블
 
 스테이지 데이터 테이블
@@ -111,7 +113,12 @@ client/
 │├── monstre5.png
 │├── monstre6.png
 │├── path.png
-│└── tower.png
+│├── tower1.png
+│├── tower2.png
+│├── tower3.png
+│├── tower4.png
+│├── tower5.png
+│└── tower6.png
 ├── src/
 │├── base.js
 │├── Constants.js
@@ -125,8 +132,10 @@ client/
 └── register.html
 node_modules/
 
-prisma/
-└── schema.prisma
+readmeAssets/
+├── monster.png
+├── packet.png
+└── stage.png
 
 src/
 ├── handler.js/
@@ -138,12 +147,14 @@ src/
 │ ├── login.handler.js
 │ ├── monster.handler.js
 │ ├── register.handler.js
+│ ├── tower.handler.js
 │ └── userData.handler.js
 ├── inint/
 │ ├── assets.js
 │ └── socket.js
 ├── models/
-│ ├── stage.model.js/
+│ ├── stage.model.js
+│ ├── tower.model.js
 │ └── user.model.js
 ├── utils/
 │ ├── app.js
