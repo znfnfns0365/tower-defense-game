@@ -9,6 +9,7 @@ Remaining base hp: ${payload.hp}`;
 };
 
 export const nextStage = (uuid, payload) => {
+  console.log(payload);
   setStage(uuid, payload);
   const message = `Next Stage: ${payload.stage}`;
   console.log(message);

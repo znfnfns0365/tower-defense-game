@@ -319,16 +319,8 @@ async function initGame(token) {
   gameLoop(); // 게임 루프 최초 실행
   //게임 시작 이벤트 발생
   sendEvent(2, {
-    userGold,
-    baseHp,
-    numOfInitialTowers,
-    monsterLevel,
-    monsterSpawnInterval,
-    score,
-    highScore,
-    monsters,
-    towers,
     token,
+    stage,
   });
   isInitGame = true;
 }
