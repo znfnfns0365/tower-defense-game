@@ -28,12 +28,6 @@ document.getElementById('register').addEventListener('click', async () => {
   }
 });
 
-// document.getElementById("back").addEventListener("click", () => {
-//     window.location.href = "index.html";
-//   });
-
-// client/src/register.js
-// 뒤로가기 버튼 클릭 시 뒤로가기
-document.getElementById('back').addEventListener('click', function () {
+document.getElementById('back').addEventListener('click', () => {
   window.location.href = 'index.html';
 });

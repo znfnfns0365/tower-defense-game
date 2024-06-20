@@ -8,9 +8,7 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
-} /* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
+}
 
 const fetchGameAssets = async () => {
   try {
@@ -26,14 +24,15 @@ let userId = null;
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_MONSTERS = 6; // 몬스터 개수
 
-let userGold = 200; // 유저 골드
+let userGold = 75; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
+let costIncrease = 0; // 타워 구매시 가격 증가량
 let numOfInitialTowers = 3; // 초기 타워 개수
 let Maxtower = 20; // 최대 타워개수
 export let gameAssets = {};
@@ -183,20 +182,6 @@ function isPositionValid(newX, newY) {
   });
 }
 
-//최대 타워 갯수 제한
-function updateTowerCountDisplay() {
-  towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
-}
-
-const towerCountDisplay = document.createElement('div');
-towerCountDisplay.style.position = 'absolute';
-towerCountDisplay.style.top = '100px';
-towerCountDisplay.style.right = '10px';
-towerCountDisplay.style.padding = '10px 20px';
-towerCountDisplay.style.fontSize = '16px';
-towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
-document.body.appendChild(towerCountDisplay);
-
 //타워 추가 생성시 유저 골드 확인 후 설치
 function placeNewTower() {
   if (towers.length >= Maxtower) {
@@ -208,18 +193,35 @@ function placeNewTower() {
     while (!isPositionValid(x, y)) {
       ({ x, y } = getRandomPositionNearPath(200));
     }
+    console.log(towerCount, 'sfsfdfsfds');
     sendEvent(55, { towerNumber: towerCount + 1, level: 1 });
     towerCount++;
     const tower = new Tower(x, y, towerCount);
     towers.push(tower);
     tower.draw(ctx, towerImages);
-    userGold -= towerCost;
-    updateTowerCountDisplay();
+    userGold -= towerCost; // 골드 차감
+    if (towers.length > 3) {
+      towerCost += costIncrease; // 구매비용 증가
+    }
   } else {
     alert('골드가 부족합니다!');
   }
 }
 
+// 마지막에 설치된 타워 삭제 후 골드 추가
+function removeTower() {
+  if (towers.length > 0) {
+    if (towers.length > 3) {
+      towerCost -= costIncrease; // 구매비용 감소
+    }
+    const selectedTower = towers[towers.length - 1];
+    sendEvent(77, { towerNumber: selectedTower.number }); // 타워 팔 때
+    let removedElement = towers.pop();
+    userGold += towerCost + 50 * (removedElement.level - 1);
+  } else {
+    alert('남은 타워가 없습니다!');
+  }
+}
 let selectedTower = null; // 선택된 타워 저장
 
 canvas.addEventListener('click', (event) => {
@@ -251,14 +253,18 @@ function placeBase() {
 function spawnMonster() {
   const { stages } = gameAssets;
   const monsterType = stages.data[stage].monsterType;
-  let monsterNumber = Math.floor(Math.random() * monsterType.length);
+  let monsterNumber;
+  let goblinChance = Math.floor(Math.random() * 10);
+  console.log(goblinChance);
+  if (goblinChance > 2) {
+    goblinChance = true;
+  }
+  goblinChance === true
+    ? (monsterNumber = 5)
+    : (monsterNumber = Math.floor(Math.random() * monsterType.length));
+
   monsters.push(
-    new Monster(
-      monsterPath,
-      monsterImages,
-      stages.data[stage].monsterLevel,
-      stages.data[stage].monsterType[monsterNumber],
-    ),
+    new Monster(monsterPath, monsterImages, stages.data[stage].monsterLevel, monsterNumber),
   );
 }
 
@@ -267,17 +273,19 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
-  if (highScore < score) highScore = score;
-
-  ctx.font = '25px Times New Roman';
+  ctx.font = 'bold 25px Times New Roman';
   ctx.fillStyle = 'skyblue';
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
   ctx.fillStyle = 'white';
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
   ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
+  ctx.fillStyle = 'magenta';
+  ctx.fillText(`현재 레벨: ${(stage % 10) + 1}`, 100, 200); // 최고 기록 표시
+  ctx.fillStyle = 'lime';
+  ctx.fillText(`포탑 가격: ${towerCost}`, 100, 250); // 최고 기록 표시
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 스테이지: ${(stage % 10) + 1}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`타워 : ${towers.length}/${Maxtower}`, 100, 300); // 현재 타워 보유 갯수 현황
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -434,8 +442,9 @@ export const sendEvent = (handlerId, payload) => {
   });
 };
 
+// 타워 구매 버튼 추가
 const buyTowerButton = document.createElement('button');
-buyTowerButton.textContent = '타워 구입';
+buyTowerButton.textContent = '타워 구매';
 buyTowerButton.style.position = 'absolute';
 buyTowerButton.style.top = '10px';
 buyTowerButton.style.right = '10px';
@@ -444,14 +453,26 @@ buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', placeNewTower);
-
 document.body.appendChild(buyTowerButton);
+
+// 타워 판매 버튼 추가
+const sellTowerButton = document.createElement('button');
+sellTowerButton.textContent = '타워 판매';
+sellTowerButton.style.position = 'absolute';
+sellTowerButton.style.top = '60px';
+sellTowerButton.style.right = '10px';
+sellTowerButton.style.padding = '10px 20px';
+sellTowerButton.style.fontSize = '16px';
+sellTowerButton.style.cursor = 'pointer';
+
+sellTowerButton.addEventListener('click', removeTower);
+document.body.appendChild(sellTowerButton);
 
 //타워 업그레이드 버튼 추가
 const upgradeTowerButton = document.createElement('button');
 upgradeTowerButton.textContent = '타워 업그레이드';
 upgradeTowerButton.style.position = 'absolute';
-upgradeTowerButton.style.top = '50px';
+upgradeTowerButton.style.top = '110px';
 upgradeTowerButton.style.right = '10px';
 upgradeTowerButton.style.padding = '10px 20px';
 upgradeTowerButton.style.fontSize = '16px';
@@ -459,15 +480,17 @@ upgradeTowerButton.style.cursor = 'pointer';
 upgradeTowerButton.disabled = true; // 초기에는 비활성화
 
 upgradeTowerButton.addEventListener('click', () => {
-  if (selectedTower && userGold >= selectedTower.upgradeCost) {
+  if (selectedTower && userGold >= selectedTower.upgradeCost && selectedTower.level < 6) {
     userGold -= selectedTower.upgradeCost;
     sendEvent(66, { towerNumber: selectedTower.number });
-    // sendEvent(77, { towerNumber: selectedTower.number }); // 타워 팔 때
     selectedTower.upgrade();
     selectedTower.isSelected = false;
     selectedTower = null;
     upgradeTowerButton.disabled = true;
-    updateTowerCountDisplay();
+  } else if (userGold <= selectedTower.upgradeCost) {
+    alert('골드가 부족합니다!');
+  } else if ((selectedTower.level = 6)) {
+    alert('이미 최대로 강화된 타워입니다!');
   }
 });
 

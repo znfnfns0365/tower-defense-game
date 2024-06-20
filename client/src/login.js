@@ -29,9 +29,9 @@ document.getElementById('login').addEventListener('click', async () => {
   }
 });
 
-//   document.getElementById("back").addEventListener("click", () => {
-//     window.location.href = "index.html";
-//   });
+  document.getElementById("back").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
 
 // client/src/login.js
 // 뒤로가기 버튼 클릭 시 뒤로가기

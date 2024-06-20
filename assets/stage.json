@@ -34,7 +34,7 @@
       "id": 4,
       "score": 4000,
       "monsterLevel": 5,
-      "monsterType": [0, 1, 2, 3, 4, 5],
+      "monsterType": [1, 2, 3, 4],
       "_comment": "Super monster? maybe",
       "monsterSpawnInterval": 512
     }
