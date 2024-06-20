@@ -186,9 +186,9 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
     userGold -= towerCost; // 골드 차감
-    if (towers.length>3) { 
-      towerCost += 1; // 구매비용 증가
-    }
+    // if (towers.length > 3) { 
+    //   towerCost += 1; // 구매비용 증가
+    // }
   } else {
     alert('골드가 부족합니다!');
   }
@@ -197,7 +197,9 @@ function placeNewTower() {
 // 마지막에 설치된 타워 삭제 후 골드 추가
 function removeTower() {
   if (towers.length > 0) {
-    towerCost -=1; // 구매비용 감소
+    // if (towers.length > 3) {
+    //   towerCost -=1; // 구매비용 감소
+    // }
     userGold += towerCost;  // towerCost * 타워레벨? 또는 그냥 강화비용 만큼
     towers.pop();
   } else {
@@ -299,7 +301,7 @@ function gameLoop() {
       sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level, stage });
       score += 100;
       const { stages } = gameAssets;
-      if (score >= stages.data[stage + 1].score) {
+      if (stage !== 4 && score >= stages.data[stage + 1].score) {
         stage++;
         sendEvent(33, { stage, score });
         const monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기

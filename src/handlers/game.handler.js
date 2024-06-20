@@ -1,16 +1,18 @@
 import { getGameAssets } from '../init/assets.js';
 import { clearStage, getStage, setStage } from '../models/stage.model.js';
-
-import { userDataClient } from '../utils/prisma/index.js';
+import { getUser, getUsername, setUser } from './userData.handler.js';
 
 export const gameStart = async (uuid, payload) => {
   //uuid 받는다고 가정
-  console.log('gamestaret', uuid);
+  console.log('gamestart');
   const { stages } = getGameAssets();
 
-  const userData = await userDataClient.user.findFirst({
-    where: { uuid: uuid },
-  });
+  // uuid로 username 찾기
+  const username = await getUsername(uuid);
+  console.log('username', username);
+
+  // username을 key값으로 userData 불러오기
+  const userData = JSON.parse(await getUser(username));
 
   clearStage(uuid);
 
@@ -23,12 +25,10 @@ export const gameStart = async (uuid, payload) => {
 
 export const gameEnd = async (uuid, payload) => {
   if (payload.score >= payload.highScore) {
-    const recordHighScore = await userDataClient.user.update({
-      where: { uuid: uuid },
-      data: {
-        highScore: payload.highScore,
-      },
-    });
+    const username = await getUsername(uuid);
+    const userData = JSON.parse(await getUser(username));
+    userData.highScore = payload.highScore;
+    setUser(username, userData);
   }
 
   return { status: 'sueccess', message: '게임 종료' };
