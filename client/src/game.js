@@ -1,8 +1,6 @@
 import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
-import stages from '../assets/stage.json.js';
-import './Socket.js';
 import { CLIENT_VERSION } from './Constants.js';
 
 function getCookie(name) {
@@ -14,6 +12,16 @@ function getCookie(name) {
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 
+const fetchGameAssets = async () => {
+  try {
+    const response = await fetch('/api/assets'); // 서버의 API 엔드포인트에 요청 보내기
+    const data = await response.json(); // JSON 형식으로 응답 데이터를 파싱
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch game assets:', error); // 요청에 실패한 경우 에러 처리
+  }
+};
+
 let userId = null;
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
@@ -23,14 +31,13 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 let userGold = 200; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
+let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
-
-// let monsterLevel = stages.data[0].monsterLevel; // 몬스터 레벨
-// let monsterSpawnInterval = stages.data[0].monsterSpawnInterval; // 몬스터 생성 주기
-let monsterLevel = 1; // 몬스터 레벨
-let monsterSpawnInterval = 1000; // 몬스터 생성 주기
+let numOfInitialTowers = 3; // 초기 타워 개수
+export let gameAssets = {};
+let monsterLevel; // 몬스터 레벨
+let monsterSpawnInterval; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
@@ -205,7 +212,17 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  const { stages } = gameAssets;
+  const monsterType = stages.data[stage].monsterType;
+  let monsterNumber = Math.floor(Math.random() * monsterType.length);
+  monsters.push(
+    new Monster(
+      monsterPath,
+      monsterImages,
+      stages.data[stage].monsterLevel,
+      stages.data[stage].monsterType[monsterNumber],
+    ),
+  );
 }
 
 function gameLoop() {
@@ -238,6 +255,7 @@ function gameLoop() {
         tower.attack(monster);
         if (monster.hp <= 0) {
           userGold += monster.goldReward; // 몬스터 처치 시 골드 획득
+          score += 10;
           // 몬스터 배열에서 제거
         }
       }
@@ -251,12 +269,13 @@ function gameLoop() {
     const monster = monsters[i];
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
-      if (isDestroyed) {
+      if (isDestroyed === 'base') {
         /* 게임 오버 */
         if (highScore < score) highScore = score;
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         //게임 오버시 이벤트 발생
         sendEvent(3, {
+          userId,
           userGold,
           baseHp,
           numOfInitialTowers,
@@ -268,11 +287,26 @@ function gameLoop() {
           towers,
         });
         location.reload();
+      } else if (isDestroyed === 'monster') {
+        sendEvent(22, {
+          hp: base.hp,
+          attackPower: monster.attackPower,
+        });
       }
       monster.draw(ctx);
+    } else if (monster.hp < 0) {
+      /* 몬스터가 타워에 죽었을 때 */
+      sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level, stage });
+      score += 100;
+      const { stages } = gameAssets;
+      if (score >= stages.data[stage + 1].score) {
+        stage++;
+        sendEvent(33, { stage, score });
+        const monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기
+        setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+      }
+      monsters.splice(i, 1);
     } else {
-      /* 몬스터가 죽었을 때 */
-      sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level });
       monsters.splice(i, 1);
     }
   }
@@ -280,16 +314,20 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame(token) {
+async function initGame(token) {
   if (isInitGame) {
     return;
   }
+
+  gameAssets = await fetchGameAssets(); // json 파일 읽어오기
+  const { stages } = gameAssets;
 
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
+  monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   //게임 시작 이벤트 발생
@@ -337,9 +375,15 @@ Promise.all([
 
   serverSocket.on('response', (data) => {
     console.log(data);
-    if (data.uuid !== undefined) {
-      userId = data.uuid;
+
+    if (data.userData !== undefined) {
+      highScore = data.userData.highScore;
+      console.log('최고 점수 설정 완료: ', highScore);
     }
+  });
+  serverSocket.on('uuid', (data) => {
+    userId = data;
+    console.log('uuid 설정 완료: ', data);
   });
 
   serverSocket.on('connection', (data) => {
@@ -358,7 +402,7 @@ Promise.all([
   */
 });
 
-const sendEvent = (handlerId, payload) => {
+export const sendEvent = (handlerId, payload) => {
   serverSocket.emit('event', {
     userId,
     clientVersion: CLIENT_VERSION,
