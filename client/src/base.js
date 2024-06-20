@@ -5,7 +5,7 @@ export class Base {
     this.y = y; // 기지 이미지 y 좌표
     this.width = 170; // 기지 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
     this.height = 225; // 기지 이미지 세로 길이
-    this.hp = 1; // 기지의 현재 HP
+    this.hp = maxHp; // 기지의 현재 HP
     this.maxHp = maxHp; // 기지의 최대 HP
   }
 
