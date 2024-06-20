@@ -30,7 +30,7 @@ const NUM_OF_MONSTERS = 6; // 몬스터 개수
 
 let userGold = 200; // 유저 골드
 let base; // 기지 객체
-let baseHp = 1; // 기지 체력
+let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
 
 let towerCost = 20; // 타워 구입 비용
@@ -224,7 +224,7 @@ canvas.addEventListener('click', (event) => {
   selectedTower = null;
   towers.forEach(tower => {
     if (clientX >= tower.x && clientX <= tower.x + tower.width &&
-        clientY >= tower.y && clientY <= tower.y + tower.height) {
+      clientY >= tower.y && clientY <= tower.y + tower.height) {
       tower.isSelected = true;
       selectedTower = tower;
     } else {
@@ -248,9 +248,9 @@ function spawnMonster() {
   let monsterNumber;
   let goblinChance = Math.floor(Math.random() * 10);
   console.log(goblinChance);
-  if(goblinChance > 2) {goblinChance = true};
-  goblinChance === true ?monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
-  
+  if (goblinChance > 2) { goblinChance = true };
+  goblinChance === true ? monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
+
   monsters.push(
     new Monster(
       monsterPath,
