@@ -261,15 +261,8 @@ function gameLoop() {
         //게임 오버시 이벤트 발생
         sendEvent(3, {
           userId,
-          userGold,
-          baseHp,
-          numOfInitialTowers,
-          monsterLevel,
-          monsterSpawnInterval,
           score,
-          highScore,
-          monsters,
-          towers,
+          highScore
         });
         location.reload();
       } else if (isDestroyed === 'monster') {
@@ -319,7 +312,6 @@ async function initGame(token) {
   sendEvent(2, {
     userGold,
     baseHp,
-    numOfInitialTowers,
     monsterLevel,
     monsterSpawnInterval,
     score,
