@@ -8,9 +8,7 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
-} /* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
+}
 
 const fetchGameAssets = async () => {
   try {
@@ -28,7 +26,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 200; // 유저 골드
+let userGold = 75; // 유저 골드
 let base; // 기지 객체
 let baseHp = 1000; // 기지 체력
 let stage = 0; // 스테이지
@@ -188,7 +186,9 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
     userGold -= towerCost; // 골드 차감
-    towerCost += 5;
+    if (towers.length>3) { 
+      towerCost += 1; // 구매비용 증가
+    }
   } else {
     alert('골드가 부족합니다!');
   }
@@ -197,8 +197,8 @@ function placeNewTower() {
 // 마지막에 설치된 타워 삭제 후 골드 추가
 function removeTower() {
   if (towers.length > 0) {
-    towerCost -=5;
-    userGold += towerCost;  // towerCost * 타워레벨? 또는 그냥 강화비용만큼 감소
+    towerCost -=1; // 구매비용 감소
+    userGold += towerCost;  // towerCost * 타워레벨? 또는 그냥 강화비용 만큼
     towers.pop();
   } else {
     alert('남은 타워가 없습니다!')
@@ -238,7 +238,7 @@ function gameLoop() {
   ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'magenta';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${(stage % 10) + 1}`, 100, 200); // 최고 기록 표시
   ctx.fillStyle = 'lime';
   ctx.fillText(`포탑 가격: ${towerCost}`, 100, 250); // 최고 기록 표시
 
