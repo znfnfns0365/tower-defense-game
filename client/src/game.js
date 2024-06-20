@@ -180,20 +180,6 @@ function isPositionValid(newX, newY) {
   });
 }
 
-//최대 타워 갯수 제한
-function updateTowerCountDisplay() {
-  towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
-}
-
-const towerCountDisplay = document.createElement('div');
-towerCountDisplay.style.position = 'absolute';
-towerCountDisplay.style.top = '150px';
-towerCountDisplay.style.right = '10px';
-towerCountDisplay.style.padding = '10px 20px';
-towerCountDisplay.style.fontSize = '16px';
-towerCountDisplay.textContent = `타워: ${towers.length}/${Maxtower}`;
-document.body.appendChild(towerCountDisplay);
-
 //타워 추가 생성시 유저 골드 확인 후 설치
 function placeNewTower() {
   if (towers.length >= Maxtower) {
@@ -207,9 +193,8 @@ function placeNewTower() {
     }
     const tower = new Tower(x, y);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages);
     userGold -= towerCost; // 골드 차감
-    updateTowerCountDisplay();
     // if (towers.length > 3) { 
     //   towerCost += 1; // 구매비용 증가
     // }
@@ -285,7 +270,8 @@ function gameLoop() {
   ctx.fillText(`현재 레벨: ${(stage % 10) + 1}`, 100, 200); // 최고 기록 표시
   ctx.fillStyle = 'lime';
   ctx.fillText(`포탑 가격: ${towerCost}`, 100, 250); // 최고 기록 표시
-
+  ctx.fillStyle = 'black';
+  ctx.fillText(`타워 : ${towers.length}/${Maxtower}`, 100, 300); // 현재 타워 보유 갯수 현황
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -402,7 +388,7 @@ Promise.all([
   console.log("All images loaded successfully");
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let authCookie = getCookie('authorization');
-  // author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
+  //author, rest api post sign token socket.io-미들웨어 jwt 검증 =>잘못 튕구
   if (!authCookie) {
     // 쿠키에 'authorization' 토큰이 없으면 로그인 유도
     alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
@@ -457,8 +443,9 @@ export const sendEvent = (handlerId, payload) => {
   });
 };
 
+// 타워 구매 버튼 추가
 const buyTowerButton = document.createElement('button');
-buyTowerButton.textContent = '타워 구입';
+buyTowerButton.textContent = '타워 구매';
 buyTowerButton.style.position = 'absolute';
 buyTowerButton.style.top = '10px';
 buyTowerButton.style.right = '10px';
@@ -469,6 +456,7 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 document.body.appendChild(buyTowerButton);
 
+// 타워 판매 버튼 추가
 const sellTowerButton = document.createElement('button');
 sellTowerButton.textContent = '타워 판매';
 sellTowerButton.style.position = 'absolute';
@@ -480,6 +468,7 @@ sellTowerButton.style.cursor = 'pointer';
 
 sellTowerButton.addEventListener('click', removeTower);
 document.body.appendChild(sellTowerButton);
+
 //타워 업그레이드 버튼 추가
 const upgradeTowerButton = document.createElement('button');
 upgradeTowerButton.textContent = '타워 업그레이드';
@@ -498,7 +487,6 @@ upgradeTowerButton.addEventListener('click', () => {
     selectedTower.isSelected = false;
     selectedTower = null;
     upgradeTowerButton.disabled = true;
-    updateTowerCountDisplay();
   }
 });
 
