@@ -1,5 +1,5 @@
 import { addUser } from '../models/user.model.js';
-import { userDataClient } from '../utils/prisma/index.js';
+import { getUser } from './userData.handler.js';
 
 const registerHandler = async (req, res, io) => {
   const { username, password } = req.body;
@@ -9,10 +9,8 @@ const registerHandler = async (req, res, io) => {
       return res.status(400).json({ message: '유저 이름과 비밀번호를 입력해주세요.' });
     }
 
-    const existingUser = await userDataClient.user.findUnique({
-      //id? accountid?
-      where: { username },
-    });
+    // username을 key값으로 userData 불러오기
+    const existingUser = JSON.parse(await getUser(username));
 
     if (existingUser) {
       return res.status(400).json({ message: '이미 존재하는 사용자 이름입니다.' });
@@ -35,3 +33,4 @@ const registerHandler = async (req, res, io) => {
 };
 
 export default registerHandler;
+
