@@ -11,31 +11,45 @@
     },
     {
       "id": 1,
-      "score": 1000,
+      "score": 2000,
       "monsterLevel": 2,
       "monsterType": [0, 1, 2],
       "monsterSpawnInterval": 2048
     },
     {
       "id": 2,
-      "score": 2000,
+      "score": 4000,
       "monsterLevel": 3,
       "monsterType": [0, 1, 2, 3],
-      "monsterSpawnInterval": 1024
+      "monsterSpawnInterval": 2048
     },
     {
       "id": 3,
-      "score": 3000,
+      "score": 8000,
       "monsterLevel": 4,
-      "monsterType": [0, 1, 2, 3, 4],
+      "monsterType": [1, 2, 3, 4],
       "monsterSpawnInterval": 1024
     },
     {
       "id": 4,
-      "score": 4000,
+      "score": 16000,
       "monsterLevel": 5,
-      "monsterType": [1, 2, 3, 4],
+      "monsterType": [2, 3, 4, 5],
       "monsterSpawnInterval": 1024
+    },
+    {
+      "id": 5,
+      "score": 32000,
+      "monsterLevel": 5,
+      "monsterType": [3, 4, 5],
+      "monsterSpawnInterval": 512
+    },
+    {
+      "id": 6,
+      "score": 64000,
+      "monsterLevel": 5,
+      "monsterType": [3, 4, 5],
+      "monsterSpawnInterval": 256
     }
   ]
 }

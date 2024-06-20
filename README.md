@@ -20,7 +20,7 @@
 
 ### AWS 배포 링크
 
-- [tower-defense-game](13.209.10.190:3000)
+- [tower-defense-game](http://13.209.10.190:3000)
 
 ### 기능
 

@@ -2,7 +2,6 @@ import { getGameAssets } from '../init/assets.js';
 import { addTower, deleteTower, getTower, updateTower } from '../models/tower.model.js';
 
 export const createTower = (uuid, payload) => {
-  //   console.log(payload);
   addTower(uuid, payload);
 
   return { status: 'sueccess', message: '타워 생성 완료' };
