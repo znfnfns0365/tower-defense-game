@@ -218,6 +218,8 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
+  if (highScore < score) highScore = score;
+
   ctx.font = '25px Times New Roman';
   ctx.fillStyle = 'skyblue';
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
@@ -284,7 +286,7 @@ function gameLoop() {
       sendEvent(44, { monsterNmb: monster.monsterNumber, monsterLvl: monster.level, stage });
       score += 100;
       const { stages } = gameAssets;
-      if (score >= stages.data[stage + 1].score) {
+      if (stage !== 4 && score >= stages.data[stage + 1].score) {
         stage++;
         sendEvent(33, { stage, score });
         const monsterSpawnInterval = stages.data[stage].monsterSpawnInterval; // 몬스터 생성 주기
