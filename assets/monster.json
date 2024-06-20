@@ -40,8 +40,8 @@
     {
       "monsterId": 6,
       "attackPower": 100,
-      "hp": 10000,
-      "speed": 1,
+      "hp": 500,
+      "speed": 6,
       "goldReward": 5
     }
   ]

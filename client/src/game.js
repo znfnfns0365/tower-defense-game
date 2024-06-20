@@ -26,7 +26,7 @@ let userId = null;
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_MONSTERS = 6; // 몬스터 개수
 
 let userGold = 200; // 유저 골드
 let base; // 기지 객체
@@ -245,13 +245,18 @@ function placeBase() {
 function spawnMonster() {
   const { stages } = gameAssets;
   const monsterType = stages.data[stage].monsterType;
-  let monsterNumber = Math.floor(Math.random() * monsterType.length);
+  let monsterNumber;
+  let goblinChance = Math.floor(Math.random() * 10);
+  console.log(goblinChance);
+  if(goblinChance > 2) {goblinChance = true};
+  goblinChance === true ?monsterNumber = 5 : monsterNumber = Math.floor(Math.random() * monsterType.length);
+  
   monsters.push(
     new Monster(
       monsterPath,
       monsterImages,
       stages.data[stage].monsterLevel,
-      stages.data[stage].monsterType[monsterNumber],
+      monsterNumber,
     ),
   );
 }
