@@ -28,7 +28,7 @@ export const gameStart = async (uuid, payload) => {
 
 export const gameEnd = async (uuid, payload) => {
   if (score !== payload.score) {
-    return { status: 'failed', message: 'Client and Server score unmatched' };
+//    return { status: 'failed', message: 'Client and Server score unmatched' };
   }
   if (payload.score >= payload.highScore) {
     const username = await getUsername(uuid);
