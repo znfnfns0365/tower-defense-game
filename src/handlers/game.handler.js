@@ -1,6 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { clearStage, getStage, setStage } from '../models/stage.model.js';
 import { clearTower } from '../models/tower.model.js';
+import { score } from './monster.handler.js';
 import { getUser, getUsername, setUser } from './userData.handler.js';
 
 export const gameStart = async (uuid, payload) => {
@@ -26,6 +27,9 @@ export const gameStart = async (uuid, payload) => {
 };
 
 export const gameEnd = async (uuid, payload) => {
+  if (score !== payload.score) {
+    return { status: 'failed', message: 'Client and Server score unmatched' };
+  }
   if (payload.score >= payload.highScore) {
     const username = await getUsername(uuid);
     const userData = JSON.parse(await getUser(username));

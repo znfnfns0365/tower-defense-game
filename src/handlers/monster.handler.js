@@ -1,6 +1,8 @@
 import { getGameAssets } from '../init/assets.js';
 import { getStage } from '../models/stage.model.js';
 
+export let score = 0;
+
 export const monsterDead = (uuid, payload) => {
   // 검증
   const currentStage = getStage(uuid);
@@ -45,10 +47,14 @@ export const monsterDead = (uuid, payload) => {
     case 4:
       monsterType = '박쥐';
       break;
+    case 5:
+      monsterType = '고블린';
+      break;
     default:
       return { status: 'false', message: "A monster number that doesn't exist" };
   }
 
+  score += 100;
   const message = `You just got rid of a ${payload.monsterLvl}Lv ${monsterType}`;
   return { status: 'success', message };
 };
